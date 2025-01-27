@@ -1,0 +1,6 @@
+flask
+joblib
+scikit-learn
+hdbscan
+opencv-python-headless
+numpy==1.26.4

@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Facial Recognition Cluster Assignment</title>
+</head>
+<body>
+    <h1>Upload a Face Image</h1>
+    <form action="/predict" method="post" enctype="multipart/form-data">
+        <input type="file" name="file" accept=".jpg,.jpeg,.png">
+        <button type="submit">Predict Cluster</button>
+    </form>
+    {% if cluster %}
+    <h2>Result: Cluster {{ cluster }}</h2>
+    {% endif %}
+</body>
+</html>
