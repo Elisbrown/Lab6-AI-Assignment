@@ -5,3 +5,4 @@ scikit-learn==1.4.0
 hdbscan==0.8.33
 opencv-python-headless==4.9.0.80
 numpy==1.26.4
+pyngrok==7.0.0
