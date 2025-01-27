@@ -5,6 +5,8 @@ import numpy as np
 from flask import Flask, request, jsonify, render_template
 from werkzeug.utils import secure_filename
 import joblib
+import sys
+from pathlib import Path
 import logging
 import hdbscan  # Add this import
 from sklearn.preprocessing import normalize  # Add this import
@@ -15,10 +17,35 @@ app = Flask(__name__)
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-# Load model artifacts
-scaler = joblib.load('scaler.pkl')
-pca = joblib.load('pca.pkl')
-clusterer = joblib.load('clusterer.pkl')
+# Load model artifacts with error handling
+try:
+    scaler = joblib.load('scaler.pkl')
+    logger.info("✅ Successfully loaded scaler.pkl")
+except Exception as e:
+    logger.error(f"❌ Failed to load scaler.pkl: {e}")
+    sys.exit(1)  # Exit with error code
+
+try:
+    pca = joblib.load('pca.pkl')
+    logger.info("✅ Successfully loaded pca.pkl")
+except Exception as e:
+    logger.error(f"❌ Failed to load pca.pkl: {e}")
+    sys.exit(1)
+
+try:
+    clusterer = joblib.load('clusterer.pkl') 
+    logger.info("✅ Successfully loaded clusterer.pkl")
+except Exception as e:
+    logger.error(f"❌ Failed to load clusterer.pkl: {e}")
+    sys.exit(1)
+
+
+MODEL_FILES = ['scaler.pkl', 'pca.pkl', 'clusterer.pkl']
+
+for file in MODEL_FILES:
+    if not Path(file).exists():
+        logger.error(f"❌ Missing required model file: {file}")
+        sys.exit(1)
 
 # Preprocess image (same as Lab 4)
 def preprocess_image(image_path):
