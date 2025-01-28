@@ -156,6 +156,113 @@
         <div id="resultContainer"></div>
     </div>
 
+    <!-- Add this right before the closing </div> of the main container -->
+<div class="text-center mt-4">
+    <button type="button" class="btn btn-link" data-bs-toggle="modal" data-bs-target="#docsModal" style="color: var(--primary-color);">Docs</button>
+    <span class="mx-2">•</span>
+    <button type="button" class="btn btn-link" data-bs-toggle="modal" data-bs-target="#howItWorksModal" style="color: var(--primary-color);">How It Works</button>
+</div>
+
+<!-- Add these modals right before the closing </body> tag -->
+<div class="modal fade" id="docsModal" tabindex="-1" aria-labelledby="docsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="docsModalLabel">Technical Documentation</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <h4>AI Facial Recognition Pipeline</h4>
+                <ol>
+                    <li><strong>Image Preprocessing</strong>
+                        <ul>
+                            <li>Convert to grayscale (1 channel)</li>
+                            <li>Resize to 50x37 pixels</li>
+                            <li>Flatten to 1D array (1850 features)</li>
+                        </ul>
+                    </li>
+                    <li><strong>Feature Scaling</strong>
+                        <ul>
+                            <li>Standardize features using pre-trained StandardScaler</li>
+                            <li>Mean removal and variance scaling</li>
+                        </ul>
+                    </li>
+                    <li><strong>Dimensionality Reduction</strong>
+                        <ul>
+                            <li>PCA with 150 components (preserves 95% variance)</li>
+                            <li>L2 normalization of reduced features</li>
+                        </ul>
+                    </li>
+                    <li><strong>Clustering</strong>
+                        <ul>
+                            <li>HDBSCAN clustering algorithm</li>
+                            <li>Density-based clustering with soft clusters</li>
+                            <li>Returns cluster label between 0-3</li>
+                        </ul>
+                    </li>
+                </ol>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="howItWorksModal" tabindex="-1" aria-labelledby="howItWorksModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="howItWorksModalLabel">How It Works</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <h4>User Workflow</h4>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="card mb-3">
+                            <div class="card-body">
+                                <h5 class="card-title">1. Upload Image</h5>
+                                <p class="card-text">
+                                    <i class="fas fa-upload me-2"></i>
+                                    Drag & drop or click to upload facial image
+                                </p>
+                                <p class="text-muted">Supported formats: JPG, JPEG, PNG</p>
+                            </div>
+                        </div>
+                        <div class="card mb-3">
+                            <div class="card-body">
+                                <h5 class="card-title">3. Get Results</h5>
+                                <p class="card-text">
+                                    <i class="fas fa-chart-pie me-2"></i>
+                                    Receive cluster assignment with visual feedback
+                                </p>
+                                <p class="text-muted">Cluster numbers represent facial feature groups</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card mb-3">
+                            <div class="card-body">
+                                <h5 class="card-title">2. AI Processing</h5>
+                                <ul class="list-unstyled">
+                                    <li><i class="fas fa-crop me-2"></i>Automatic image standardization</li>
+                                    <li><i class="fas fa-microchip me-2"></i>Feature extraction (1850 dimensions)</li>
+                                    <li><i class="fas fa-project-diagram me-2"></i>Dimensionality reduction (PCA)</li>
+                                    <li><i class="fas fa-network-wired me-2"></i>Cluster prediction (HDBSCAN)</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
     <script>
         const dropZone = document.getElementById('dropZone');
         const fileInput = document.getElementById('fileInput');
