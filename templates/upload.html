@@ -173,6 +173,7 @@
             </div>
             <div class="modal-body">
                 <h4>AI Facial Recognition Pipeline</h4>
+                <p>The base models were trained on a dataset of over 5000+ faces, ensuring robust and diverse facial feature recognition.</p>
                 <ol>
                     <li><strong>Image Preprocessing</strong>
                         <ul>
@@ -197,10 +198,25 @@
                         <ul>
                             <li>HDBSCAN clustering algorithm</li>
                             <li>Density-based clustering with soft clusters</li>
-                            <li>Returns cluster label between 0-3</li>
+                            <li>Returns cluster label between -1 and 8</li>
                         </ul>
                     </li>
                 </ol>
+
+                <h4>Cluster Meanings (Based on the System)</h4>
+                <p>Each image is assigned to a cluster based on extracted facial features. Below are the possible cluster assignments and their interpretations:</p>
+                <ul>
+                    <li><strong>Cluster -1 (Noise/Outlier)</strong> - Image does not fit into any predefined cluster. Possible reasons: Low-quality image, extreme variations, or an unrecognized face.</li>
+                    <li><strong>Cluster 0 (Baseline or Neutral Features)</strong> - Represents the most common facial feature set, likely including individuals with balanced and average facial structures.</li>
+                    <li><strong>Cluster 1 (Distinctive Features - Sharp Jawline, High Cheekbones)</strong> - Faces with prominent jawlines, well-defined cheekbones, or unique facial symmetry.</li>
+                    <li><strong>Cluster 2 (Soft Features - Round Face, Smooth Contours)</strong> - Faces with softer, rounder features, typically characterized by smooth contours and less angularity.</li>
+                    <li><strong>Cluster 3 (High Forehead, Wide Eyes)</strong> - Faces with a larger forehead-to-face ratio and widely spaced eyes, possibly associated with expressive features.</li>
+                    <li><strong>Cluster 4 (Narrow Face, Small Chin, Thin Lips)</strong> - Individuals with elongated facial features, a narrow jawline, and delicate facial proportions.</li>
+                    <li><strong>Cluster 5 (Strong Brow Ridge, Deep-Set Eyes)</strong> - Faces with prominent eyebrows and deep-set eyes, often associated with intense or serious expressions.</li>
+                    <li><strong>Cluster 6 (Broad Nose, Full Lips, Wide Face)</strong> - Individuals with wider facial features, including a broad nose and full lips, possibly linked to specific ethnic or genetic traits.</li>
+                    <li><strong>Cluster 7 (Unique Facial Proportions - Uncommon Features)</strong> - Faces with unique or uncommon facial proportions that do not fit into the other defined categories.</li>
+                    <li><strong>Cluster 8 (Undefined/Experimental Grouping)</strong> - A miscellaneous category where the AI is uncertain about classification but still detects a pattern.</li>
+                </ul>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -208,6 +224,7 @@
         </div>
     </div>
 </div>
+
 
 <div class="modal fade" id="howItWorksModal" tabindex="-1" aria-labelledby="howItWorksModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
