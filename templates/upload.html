@@ -1,16 +1,257 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Facial Recognition Cluster Assignment</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="./favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="./favicon-16x16.png">
+<link rel="manifest" href="./site.webmanifest">
+    <style>
+        :root {
+            --primary-color: #6c5ce7;
+            --secondary-color: #a8a5e6;
+        }
+
+        body {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #f5f6fa 0%, #e9ecef 100%);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .upload-container {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 2rem;
+        }
+
+        .upload-card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .upload-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .drop-zone {
+            border: 3px dashed var(--secondary-color);
+            border-radius: 15px;
+            padding: 3rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: rgba(168, 165, 230, 0.05);
+        }
+
+        .drop-zone.dragover {
+            border-color: var(--primary-color);
+            background: rgba(108, 92, 231, 0.1);
+            box-shadow: 0 0 20px rgba(108, 92, 231, 0.2);
+        }
+
+        .preview-container {
+            position: relative;
+            margin: 2rem 0;
+            display: none;
+        }
+
+        .preview-image {
+            max-width: 100%;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .upload-btn {
+            background: var(--primary-color);
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+        }
+
+        .upload-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(108, 92, 231, 0.4);
+        }
+
+        .upload-icon {
+            font-size: 4rem;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+
+        .result-card {
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .developer-link {
+    color: var(--primary-color);
+    text-decoration: none;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.developer-link:hover {
+    color: #4a3ac7;
+    text-decoration: underline;
+}
+
+.developer-link::after {
+    content: " \1F4F1";
+    font-size: 0.8em;
+    opacity: 0.7;
+}
+    </style>
 </head>
 <body>
-    <h1>Upload a Face Image</h1>
-    <form action="/predict" method="post" enctype="multipart/form-data">
-        <input type="file" name="file" accept=".jpg,.jpeg,.png">
-        <button type="submit">Predict Cluster</button>
-    </form>
-    {% if cluster %}
-    <h2>Result: Cluster {{ cluster }}</h2>
-    {% endif %}
+<div class="container upload-container">
+
+        <!-- Add project title and developer credits -->
+        <h2 class="text-center project-title">AI-Powered Facial Feature Clustering System <br> (Lab6-SWE-2025)YIBS</h2>
+        <div class=" text-center developer-credits my-2">
+            Developed by <a href="https://wa.me/+237679690703" target="_blank" class="developer-link">Engr. Sunyin Elisbrown</a> 
+            Collaborator: <a href="https://wa.me/+237654346042" target="_blank" class="developer-link">Engr. Kabrel Noubissie</a>
+        </div>
+        <div class="upload-card p-4">
+            <h1 class="text-center mb-4 fw-bold" style="color: var(--primary-color);">Facial Recognition Analysis</h1>
+
+            <form action="/predict" method="post" enctype="multipart/form-data" id="uploadForm">
+                <div class="drop-zone" id="dropZone">
+                    <div class="d-flex flex-column align-items-center">
+                        <i class="fas fa-cloud-upload-alt upload-icon"></i>
+                        <h4 class="mb-3">Drag & Drop Your Image</h4>
+                        <p class="text-muted">Supports JPG, JPEG, PNG</p>
+                        <input type="file" name="file" id="fileInput" accept=".jpg,.jpeg,.png" hidden>
+                        <button type="button" class="btn upload-btn" onclick="document.getElementById('fileInput').click()">
+                            Choose File
+                        </button>
+                    </div>
+                </div>
+
+                <div class="preview-container" id="previewContainer">
+                    <img src="#" alt="Preview" class="preview-image" id="previewImage">
+                </div>
+
+                <div class="text-center mt-4">
+                    <button type="submit" class="btn upload-btn px-5" id="submitBtn">
+                        Analyze Image <i class="fas fa-magic ms-2"></i>
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Results will be inserted here dynamically -->
+        <div id="resultContainer"></div>
+    </div>
+
+    <script>
+        const dropZone = document.getElementById('dropZone');
+        const fileInput = document.getElementById('fileInput');
+        const previewContainer = document.getElementById('previewContainer');
+        const previewImage = document.getElementById('previewImage');
+        const submitBtn = document.getElementById('submitBtn');
+        const resultContainer = document.getElementById('resultContainer');
+
+        // Drag & Drop Handlers
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.classList.add('dragover');
+        });
+
+        dropZone.addEventListener('dragleave', () => {
+            dropZone.classList.remove('dragover');
+        });
+
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('dragover');
+            const file = e.dataTransfer.files[0];
+            handleFile(file);
+        });
+
+        // File Input Handler
+        fileInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            handleFile(file);
+        });
+
+        // Form Submission Handler
+        document.getElementById('uploadForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData();
+            formData.append('file', fileInput.files[0]);
+
+            // Show loading state
+            submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Processing...';
+            submitBtn.disabled = true;
+
+            try {
+                const response = await fetch('/predict', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (!response.ok) {
+                    throw new Error(await response.text());
+                }
+
+                const result = await response.json();
+                showResult(result.cluster);
+
+            } catch (error) {
+                showError(error.message || 'Failed to process image');
+            } finally {
+                // Reset button
+                submitBtn.innerHTML = 'Analyze Image <i class="fas fa-magic ms-2"></i>';
+                submitBtn.disabled = false;
+            }
+        });
+
+        function handleFile(file) {
+            if (file && file.type.startsWith('image/')) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    previewImage.src = e.target.result;
+                    previewContainer.style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            } else {
+                showError('Please select a valid image file (JPG, JPEG, PNG)');
+            }
+        }
+
+        function showResult(cluster) {
+            resultContainer.innerHTML = `
+                <div class="result-card mt-4 p-4 bg-white rounded-3 shadow-sm border-start border-4 border-primary">
+                    <h2 class="mb-0 text-center text-primary">Analysis Result: Cluster ${cluster}</h2>
+                </div>
+            `;
+        }
+
+        function showError(message) {
+            const alert = document.createElement('div');
+            alert.className = 'alert alert-danger mt-3 fade show';
+            alert.role = 'alert';
+            alert.innerHTML = `
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            `;
+            document.querySelector('.upload-card').appendChild(alert);
+        }
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

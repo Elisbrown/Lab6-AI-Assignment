@@ -8,22 +8,20 @@ import joblib
 import sys
 from pathlib import Path
 import logging
-import hdbscan  # Add this import
-from sklearn.preprocessing import normalize  # Add this import
-# Initialize Flask app
-app = Flask(__name__)
+import hdbscan
+from sklearn.preprocessing import normalize
 
-# Configure logging
+app = Flask(__name__)
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-# Load model artifacts with error handling
+# Model loading code remains the same
 try:
     scaler = joblib.load('scaler.pkl')
     logger.info("✅ Successfully loaded scaler.pkl")
 except Exception as e:
     logger.error(f"❌ Failed to load scaler.pkl: {e}")
-    sys.exit(1)  # Exit with error code
+    sys.exit(1)
 
 try:
     pca = joblib.load('pca.pkl')
@@ -33,25 +31,22 @@ except Exception as e:
     sys.exit(1)
 
 try:
-    clusterer = joblib.load('clusterer.pkl') 
+    clusterer = joblib.load('clusterer.pkl')
     logger.info("✅ Successfully loaded clusterer.pkl")
 except Exception as e:
     logger.error(f"❌ Failed to load clusterer.pkl: {e}")
     sys.exit(1)
 
-
 MODEL_FILES = ['scaler.pkl', 'pca.pkl', 'clusterer.pkl']
-
 for file in MODEL_FILES:
     if not Path(file).exists():
         logger.error(f"❌ Missing required model file: {file}")
         sys.exit(1)
 
-# Preprocess image (same as Lab 4)
 def preprocess_image(image_path):
     try:
         img = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
-        img = cv2.resize(img, (37, 50))  # LFW dimensions (width=37, height=50)
+        img = cv2.resize(img, (37, 50))
         flattened = img.reshape(1, -1)
         scaled = scaler.transform(flattened)
         pca_reduced = pca.transform(scaled)
@@ -61,7 +56,9 @@ def preprocess_image(image_path):
         logger.error(f"Preprocessing failed: {e}")
         raise
 
-# API endpoint for predictions
+TEMP_DIR = os.path.join(os.getcwd(), 'temp')
+os.makedirs(TEMP_DIR, exist_ok=True)
+
 @app.route('/predict', methods=['POST'])
 def predict():
     if 'file' not in request.files:
@@ -72,30 +69,25 @@ def predict():
         return jsonify({"error": "Empty filename"}), 400
 
     try:
-        # Save the uploaded file temporarily
+        os.makedirs(TEMP_DIR, exist_ok=True)
         filename = secure_filename(file.filename)
-        filepath = os.path.join('/tmp', filename)
+        filepath = os.path.join(TEMP_DIR, filename)
         file.save(filepath)
-        
-        logger.info(f"Request received at {datetime.now()}: {filename}")
+        logger.info(f"Request received: {filename}")
 
-
-        # Preprocess and predict
         processed_data = preprocess_image(filepath)
         cluster_label, _ = hdbscan.approximate_predict(clusterer, processed_data)
-        
-        # Log the prediction
-        logger.info(f"Prediction: Cluster {cluster_label[0]} for {filename}")
+
+        if os.path.exists(filepath):
+            os.remove(filepath)
+            logger.info(f"Removed temp file: {filepath}")
 
         return jsonify({"cluster": int(cluster_label[0])})
 
     except Exception as e:
         logger.error(f"Prediction error: {e}")
         return jsonify({"error": str(e)}), 500
-    
 
-
-# Simple frontend for testing
 @app.route('/')
 def home():
     return render_template('upload.html')
